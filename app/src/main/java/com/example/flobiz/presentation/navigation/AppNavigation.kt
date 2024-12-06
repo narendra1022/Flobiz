@@ -4,12 +4,15 @@ package com.example.flobiz.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.flobiz.presentation.EntryScreen
+import androidx.navigation.navArgument
+import com.example.flobiz.presentation.transactionEntryScreen.EntryScreen
 import com.example.flobiz.presentation.authentication.AuthScreen
 import com.example.flobiz.presentation.authentication.AuthViewModel
 import com.example.flobiz.presentation.dashboard.DashboardScreen
+import com.example.flobiz.presentation.detailedScreen.DetailScreen
 
 @Composable
 fun AppNavigation(
@@ -40,6 +43,11 @@ fun AppNavigation(
             DashboardScreen(
                 onAddTransaction = {
                     navController.navigate(Routes.TransactionEntry.route)
+                },
+                onTransactionClick = { transactionId ->
+                    navController.navigate(
+                        Routes.TransactionDetail.createRoute(transactionId)
+                    )
                 }
             )
         }
@@ -53,5 +61,23 @@ fun AppNavigation(
             )
         }
 
+        // Transaction Detail Screen
+        composable(
+            route = Routes.TransactionDetail.route,
+            arguments = listOf(
+                navArgument("transactionId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val transactionId = backStackEntry.arguments?.getString("transactionId")
+            DetailScreen(
+                transactionId = transactionId ?: "",
+                onBack = { navController.navigateUp() },
+                onTransactionDeleted = { navController.navigateUp() }
+            )
+        }
     }
+
 }
+
