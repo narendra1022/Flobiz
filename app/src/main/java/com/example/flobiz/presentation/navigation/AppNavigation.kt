@@ -6,9 +6,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.flobiz.presentation.EntryScreen
 import com.example.flobiz.presentation.authentication.AuthScreen
 import com.example.flobiz.presentation.authentication.AuthViewModel
-import com.example.flobiz.presentation.screens.DashboardScreen
+import com.example.flobiz.presentation.dashboard.DashboardScreen
 
 @Composable
 fun AppNavigation(
@@ -22,6 +23,7 @@ fun AppNavigation(
         else
             Routes.Auth.route
     ) {
+
         // Authentication Screen
         composable(Routes.Auth.route) {
             AuthScreen(
@@ -32,9 +34,23 @@ fun AppNavigation(
                 }
             )
         }
+
         // Dashboard Screen
         composable(Routes.Dashboard.route) {
-            DashboardScreen()
+            DashboardScreen(
+                onAddTransaction = {
+                    navController.navigate(Routes.TransactionEntry.route)
+                }
+            )
+        }
+
+        // Transaction Entry Screen
+        composable(Routes.TransactionEntry.route) {
+            EntryScreen(
+                onTransactionSaved = {
+                    navController.navigateUp()
+                }
+            )
         }
 
     }
