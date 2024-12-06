@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,8 +31,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -44,8 +43,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.flobiz.R
@@ -53,6 +54,8 @@ import com.example.flobiz.data.model.Transaction
 import com.example.flobiz.data.model.TransactionType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,29 +66,48 @@ fun DashboardScreen(
     val transactions by viewModel.transactions.collectAsState()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Expense Tracker") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-        },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddTransaction) {
-                Icon(Icons.Default.Add, contentDescription = "Add Transaction")
+            FloatingActionButton(
+                containerColor = colorResource(id = R.color.colorPrimary),
+                contentColor = Color.White,
+                modifier = Modifier
+                    .height(45.dp),
+                onClick = onAddTransaction,
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Transaction")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Add Task  ")
+                }
             }
         }
+
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            TransactionList(
-                transactions = transactions,
-                onDeleteTransaction = { transaction ->
-                    viewModel.deleteTransaction(transaction.id)
-                }
+
+        Column(modifier = Modifier.padding(paddingValues)) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                text = "Recent Transactions",
+                color = Color.Gray,
+                fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.height(5.dp))
+            Box() {
+                TransactionList(
+                    transactions = transactions,
+                    onDeleteTransaction = { transaction ->
+                        viewModel.deleteTransaction(transaction.id)
+                    }
+                )
+            }
         }
+
     }
 }
 
@@ -164,7 +186,10 @@ fun TransactionItem(transaction: Transaction) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White,
+        ),
+        elevation = CardDefaults.cardElevation(5.dp)
     ) {
         Row(
             modifier = Modifier
@@ -181,20 +206,21 @@ fun TransactionItem(transaction: Transaction) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = transaction.transactionType.toString(),
+                    text = if (transaction.transactionType.toString() == "EXPENSE") "Expense" else "Income",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = transaction.date.toString(),
+                    text = formatDate(transaction.date.toString()),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
 
             Text(
+                modifier = Modifier.align(Alignment.Top),
                 text = "₹ ${String.format("%.2f", transaction.amount)}",
                 color = when (transaction.transactionType) {
-                    TransactionType.INCOME -> Color.Green
-                    TransactionType.EXPENSE -> Color.Black
+                    TransactionType.INCOME -> Color.Black
+                    TransactionType.EXPENSE -> Color.Red
                 },
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
@@ -203,3 +229,10 @@ fun TransactionItem(transaction: Transaction) {
     }
 }
 
+fun formatDate(input: String): String {
+    val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
+    val date = inputFormat.parse(input)
+
+    val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
+    return date?.let { outputFormat.format(it) } ?: "Invalid date"
+}
