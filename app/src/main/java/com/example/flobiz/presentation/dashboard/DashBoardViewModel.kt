@@ -6,8 +6,11 @@ import com.example.flobiz.data.model.Transaction
 import com.example.flobiz.data.repository.DashBoardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,11 +20,24 @@ class DashBoardViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
-    val transactions: StateFlow<List<Transaction>> = _transactions.asStateFlow()
-
+    private val _filterQuery = MutableStateFlow("")
+    val filterQuery: StateFlow<String> = _filterQuery.asStateFlow()
+    val transactions: StateFlow<List<Transaction>> = combine(
+        _transactions,
+        _filterQuery
+    ) { transactions, query ->
+        if (query.isEmpty()) transactions
+        else transactions.filter {
+            it.description.contains(query, ignoreCase = true)
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     init {
         fetchAllTransactions()
+    }
+
+    fun updateFilterQuery(query: String) {
+        _filterQuery.value = query
     }
 
     private fun fetchAllTransactions() {
@@ -43,5 +59,4 @@ class DashBoardViewModel @Inject constructor(
             repository.deleteTransaction(transactionId)
         }
     }
-
 }
