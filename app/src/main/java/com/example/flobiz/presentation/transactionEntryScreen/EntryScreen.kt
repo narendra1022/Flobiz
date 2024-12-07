@@ -152,19 +152,14 @@ fun EntryScreen(
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Label Text on the left
                 Text(
                     text = "Total Amount",
                     modifier = Modifier.weight(2.5f)
                 )
-
-                // Rupee Symbol Text in front of the TextField
                 Text(
                     text = "₹",
                     modifier = Modifier.padding(end = 8.dp)
                 )
-
-                // Input TextField on the right
                 OutlinedTextField(
                     value = amount,
                     onValueChange = {

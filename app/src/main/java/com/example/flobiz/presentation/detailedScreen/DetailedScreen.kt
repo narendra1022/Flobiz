@@ -42,12 +42,12 @@ fun DetailScreen(
     var isDatePickerVisible by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    // Fetch transaction details
+    // Fetching the transaction details
     val transaction by remember(transactionId) {
         viewModel.getTransactionById(transactionId)
     }.collectAsState(initial = null)
 
-    // When transaction is fetched, populate the fields with existing data
+    // When transaction is fetched, populating the fields with existing data
     LaunchedEffect(transaction) {
         transaction?.let {
             amount = it.amount.toString()
@@ -154,7 +154,7 @@ fun DetailScreen(
                     value = description,
                     onValueChange = {
                         description = it
-                    }, // Directly update description on text change
+                    },
                     label = { Text("Description") },
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 2
@@ -240,7 +240,6 @@ fun DetailScreen(
                 }
             }
         } ?: run {
-            // Loading or Error State
             CircularProgressIndicator(
                 modifier = Modifier
                     .fillMaxSize()

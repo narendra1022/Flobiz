@@ -58,9 +58,6 @@ fun TransactionItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-//        colors = CardDefaults.cardColors(
-//            containerColor = Color.White,
-//        ),
         elevation = CardDefaults.cardElevation(5.dp)
     ) {
         Row(
