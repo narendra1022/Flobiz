@@ -1,5 +1,6 @@
 package com.example.flobiz.presentation.transactionEntryScreen
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +45,7 @@ import com.example.flobiz.R
 import com.example.flobiz.data.model.Transaction
 import com.example.flobiz.data.model.TransactionType
 import com.example.flobiz.presentation.dashboard.DashBoardViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -59,6 +62,7 @@ fun EntryScreen(
     var selectedDate by remember { mutableStateOf(Date()) }
     var isDatePickerVisible by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -194,7 +198,10 @@ fun EntryScreen(
                         viewModel.addTransaction(transaction)
                         onTransactionSaved()
                     } else {
-                        // Show error
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Add amount")
+                            // showSnackbar - suspend function
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()

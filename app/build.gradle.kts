@@ -85,6 +85,9 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
 
+    //SplashScreen
+    implementation(libs.androidx.core.splashscreen)
+
 
 }
 // Allow references to generated code

@@ -17,7 +17,6 @@ class DetailViewModel @Inject constructor(
     private val authViewModel: FirebaseAuth
 ) : ViewModel() {
 
-    // Fetch transaction by ID - Returns a Flow
     fun getTransactionById(transactionId: String): Flow<Transaction?> = flow {
         val userId = authViewModel.currentUser?.uid
         val snapshot = userId?.let {
@@ -26,14 +25,13 @@ class DetailViewModel @Inject constructor(
                 .collection("transactions")
                 .document(transactionId)
                 .get()
-                .await() // Suspending function, so the thread isn't blocked
+                .await()
         }
 
         val transaction = snapshot?.toObject(Transaction::class.java)
-        emit(transaction) // Emit the result as part of the flow
+        emit(transaction)
     }
 
-    // Update the transaction - Suspended function to perform async operation
     suspend fun updateTransaction(transaction: Transaction) {
         val userId = authViewModel.currentUser?.uid
         userId?.let {
@@ -42,11 +40,10 @@ class DetailViewModel @Inject constructor(
                 .collection("transactions")
                 .document(transaction.id)
                 .set(transaction)
-                .await() // Suspending function to await Firestore operation
+                .await()
         }
     }
 
-    // Delete the transaction - Suspended function to perform async operation
     suspend fun deleteTransaction(transactionId: String) {
         val userId = authViewModel.currentUser?.uid
         userId?.let {
@@ -55,7 +52,7 @@ class DetailViewModel @Inject constructor(
                 .collection("transactions")
                 .document(transactionId)
                 .delete()
-                .await() // Suspending function to await Firestore operation
+                .await()
         }
     }
 }

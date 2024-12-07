@@ -35,7 +35,7 @@ class DashBoardRepository @Inject constructor(
     fun getAllTransactions(): Flow<List<Transaction>> = callbackFlow {
         val listenerRegistration = transactionsCollection.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                close(error)  // Handle errors (optional)
+                close(error)
             } else {
                 snapshot?.let {
                     val transactions = it.toObjects(Transaction::class.java)

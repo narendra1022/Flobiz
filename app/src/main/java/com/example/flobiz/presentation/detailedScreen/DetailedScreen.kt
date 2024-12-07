@@ -40,6 +40,7 @@ fun DetailScreen(
     var transactionType by remember { mutableStateOf(TransactionType.EXPENSE) }
     var selectedDate by remember { mutableStateOf(Date()) }
     var isDatePickerVisible by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     // Fetch transaction details
     val transaction by remember(transactionId) {
@@ -164,19 +165,14 @@ fun DetailScreen(
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Label Text on the left
                     Text(
                         text = "Total Amount",
                         modifier = Modifier.weight(2.5f)
                     )
-
-                    // Rupee Symbol Text in front of the TextField
                     Text(
                         text = "₹",
                         modifier = Modifier.padding(end = 8.dp)
                     )
-
-                    // Input TextField on the right
                     OutlinedTextField(
                         value = amount,
                         onValueChange = {
@@ -198,15 +194,15 @@ fun DetailScreen(
                     onClick = {
                         if (amount.isNotEmpty() && amount.toDoubleOrNull() != null) {
                             val updatedTransaction = Transaction(
-                                id = txn.id, // Preserve the transaction ID for update
+                                id = txn.id,
                                 date = selectedDate,
                                 transactionType = transactionType,
                                 amount = amount.toDouble(),
                                 description = description
                             )
-                            viewModel.viewModelScope.launch {
+                            scope.launch {
                                 viewModel.updateTransaction(updatedTransaction)
-                                onBack() // Navigate back after saving
+                                onBack()
                             }
                         }
                     },
